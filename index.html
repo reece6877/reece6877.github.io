@@ -1,106 +1,141 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jquery.terminal/js/jquery.terminal.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery.terminal/css/jquery.terminal.min.css"/>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fake Terminal Simulator</title>
     <style>
-        body { margin: 0; height: 100vh; background-color: #050505; }
-        .terminal { --color: #00ff41; --size: 1.1; }
+        body {
+            background-color: #000;
+            color: #0f0;
+            font-family: 'Courier New', monospace;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        #terminal {
+            width: 80%;
+            height: 80%;
+            background-color: #111;
+            border: 1px solid #0f0;
+            padding: 10px;
+            overflow-y: auto;
+            box-shadow: 0 0 10px #0f0;
+        }
+        #output {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        #input {
+            width: 100%;
+            background: none;
+            border: none;
+            color: #0f0;
+            font-family: inherit;
+            outline: none;
+        }
+        .prompt {
+            color: #0f0;
+        }
     </style>
 </head>
 <body>
-<script>
-// Mock Network Database
-const network = {
-    '192.168.1.1': { status: 'Firewall', ports: 'All ports filtered', vuln: false },
-    '192.168.1.15': { status: 'Workstation', ports: 'Port 443 (Closed)', vuln: false },
-    '192.168.1.42': { status: 'Web Server', ports: 'Port 80 (Open)', vuln: true, pass: 'p@ssword123' }
-};
+    <div id="terminal">
+        <div id="output"></div>
+        <span class="prompt">user@fake-terminal:~$ </span><input type="text" id="input" autofocus>
+    </div>
 
-const commands = {
-    help: function() {
-        this.echo('[[b;white;]COMMAND LIST:]\n' +
-                  '  scan network  - Discover devices on local network\n' +
-                  '  nmap [IP]     - Deep scan a specific IP\n' +
-                  '  brute [IP]    - Launch brute-force attack on Port 80\n' +
-                  '  clear         - Wipe terminal');
-    },
+    <script>
+        const output = document.getElementById('output');
+        const input = document.getElementById('input');
+        const terminal = document.getElementById('terminal');
 
-    scan: function(target) {
-        if (target === 'network') {
-            this.echo('Scanning subnet 192.168.1.0/24...');
-            this.pause();
-            setTimeout(() => {
-                this.echo('\n[[b;white;]Devices Discovered:]');
-                this.echo('  > 192.168.1.1  (Unknown Vendor)');
-                this.echo('  > 192.168.1.15 (Dell-Workstation)');
-                this.echo('  > 192.168.1.42 (Apache-Linux-Server)');
-                this.resume();
-            }, 2000);
-        } else {
-            this.echo('Usage: scan network');
-        }
-    },
+        // Simulated installed tools
+        let installedTools = new Set();
 
-    nmap: function(ip) {
-        if (!network[ip]) return this.echo('Error: No response from host ' + ip);
-        
-        this.echo('Starting Nmap 7.80 at ' + new Date().toLocaleTimeString());
-        this.pause();
-        
-        setTimeout(() => {
-            const host = network[ip];
-            this.echo('Scanning ' + ip + '...');
-            this.echo('Status: ' + host.status);
-            this.echo('Result: ' + host.ports);
-            if (host.vuln) {
-                this.echo('[[b;yellow;]VULNERABILITY FOUND:] Remote Login Enabled on Port 80.');
-            } else {
-                this.echo('[[b;red;]SECURITY CHECK:] Host is hardened. No entry points.');
+        // Fake data for tools
+        const fakeIPs = ['192.168.1.1', '10.0.0.1', '172.16.0.1', '8.8.8.8', '1.1.1.1'];
+        const fakePorts = [80, 443, 22, 21, 3389];
+
+        // Command handlers
+        const commands = {
+            help: () => {
+                return 'Available commands:\n' +
+                       'help - show this help\n' +
+                       'install <tool> - fake install a tool (e.g., nmap, hydra)\n' +
+                       'nmap <target> - fake nmap scan\n' +
+                       'hydra <target> - fake brute force with hydra\n' +
+                       'ls - list fake directory\n' +
+                       'clear - clear the screen\n';
+            },
+            install: (args) => {
+                if (args.length < 1) return 'Usage: install <tool>';
+                const tool = args[0].toLowerCase();
+                installedTools.add(tool);
+                return `Fake installing ${tool}... Done! (Nothing actually installed)`;
+            },
+            nmap: (args) => {
+                if (!installedTools.has('nmap')) return 'nmap not installed. Use "install nmap" first.';
+                if (args.length < 1) return 'Usage: nmap <target>';
+                const target = args[0];
+                let result = `Starting fake Nmap scan on ${target}\n`;
+                result += 'Host is up (0.001s latency).\n';
+                fakeIPs.forEach(ip => {
+                    result += `Discovered fake IP: ${ip}\n`;
+                });
+                fakePorts.forEach(port => {
+                    result += `Port ${port}/tcp open (fake service)\n`;
+                });
+                return result + 'Fake Nmap done: 1 IP address scanned in 0.01 seconds';
+            },
+            hydra: (args) => {
+                if (!installedTools.has('hydra')) return 'hydra not installed. Use "install hydra" first.';
+                if (args.length < 1) return 'Usage: hydra <target>';
+                const target = args[0];
+                return `Starting fake brute force on ${target}...\n` +
+                       'Trying fake passwords...\n' +
+                       '[FAKE] [ssh] host: 192.168.1.1   login: admin   password: password123\n' +
+                       '[FAKE] [http] host: 10.0.0.1   login: user   password: letmein\n' +
+                       'Fake brute force complete. (No real attempts made)';
+            },
+            ls: () => {
+                return 'fake_file.txt  pretend_dir/  imaginary_script.sh';
+            },
+            clear: () => {
+                output.innerHTML = '';
+                return '';
             }
-            this.resume();
-        }, 1500);
-    },
+        };
 
-    brute: function(ip) {
-        if (!ip || !network[ip]) return this.echo('Usage: brute [TARGET_IP]');
-        if (!network[ip].vuln) return this.echo('Error: No open login gateway found on ' + ip);
-
-        const term = this;
-        const wordlist = ['admin', '12345', 'qwerty', 'p@ssword123'];
-        term.echo('Starting Brute Force on ' + ip + ' Port 80...');
-        term.pause();
-
-        let i = 0;
-        const interval = setInterval(() => {
-            term.echo('Trying credential: ' + wordlist[i] + ' ... [[b;red;]ACCESS DENIED]');
-            
-            if (wordlist[i] === network[ip].pass) {
-                clearInterval(interval);
-                term.echo('Trying credential: ' + wordlist[i] + ' ... [[b;green;]LOGIN SUCCESSFUL]');
-                term.echo('\n[[b;white;]-- CONNECTION ESTABLISHED --]');
-                term.echo('Logged in as: root@web-server-42');
-                term.echo('Type "ls" to see server files...');
-                term.resume();
-                // We change the terminal's commands once logged in
-                term.push(function(cmd) {
-                    if (cmd === 'ls') term.echo('database.db  config.php  secret_plans.pdf');
-                    else if (cmd === 'exit') term.pop();
-                    else term.echo('root@web-server-42: command not found');
-                }, { prompt: 'root@web-server-42# ' });
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const commandLine = input.value.trim();
+                output.innerHTML += `<div class="prompt">user@fake-terminal:~$ </div>${commandLine}\n`;
+                
+                const [cmd, ...args] = commandLine.split(/\s+/);
+                const lowerCmd = cmd.toLowerCase();
+                
+                let result = 'Command not found: ' + cmd;
+                if (commands[lowerCmd]) {
+                    result = commands[lowerCmd](args);
+                }
+                
+                if (result) {
+                    output.innerHTML += result + '\n';
+                }
+                
+                input.value = '';
+                terminal.scrollTop = terminal.scrollHeight;
             }
-            i++;
-            if (i >= wordlist.length && !term.paused()) clearInterval(interval);
-        }, 1000);
-    }
-};
+        });
 
-$('body').terminal(commands, {
-    greetings: '[[b;green;]REECE-OS v3.0 (Net-Infiltrator)]\n' +
-               'Scanning for available uplinks... [OK]\n' +
-               'Type "help" to see available exploit tools.\n'
-});
-</script>
+        // Initial welcome message
+        output.innerHTML = 'Welcome to Fake Terminal Simulator\n' +
+                           'This is a purely simulated environment. Nothing here is real or functional.\n' +
+                           'Type "help" for available commands.\n\n';
+    </script>
 </body>
 </html>
