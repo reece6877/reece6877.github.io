@@ -4,16 +4,102 @@
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jquery.terminal/js/jquery.terminal.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery.terminal/css/jquery.terminal.min.css"/>
-    <style>body { margin: 0; height: 100vh; }</style>
+    <style>
+        body { margin: 0; height: 100vh; background-color: #050505; }
+        .terminal { --color: #00ff41; --size: 1.1; }
+    </style>
 </head>
 <body>
 <script>
-$('body').terminal({
-    hello: function() { this.echo('Hello reece6877! Welcome to your terminal.'); },
-    whoami: function() { this.echo('You are a web developer in the making.'); },
-    help: function() { this.echo('Try: hello, whoami, or clear'); }
-}, {
-    greetings: 'REECE-OS v1.0\nType "help" to begin...'
+// Mock Network Database
+const network = {
+    '192.168.1.1': { status: 'Firewall', ports: 'All ports filtered', vuln: false },
+    '192.168.1.15': { status: 'Workstation', ports: 'Port 443 (Closed)', vuln: false },
+    '192.168.1.42': { status: 'Web Server', ports: 'Port 80 (Open)', vuln: true, pass: 'p@ssword123' }
+};
+
+const commands = {
+    help: function() {
+        this.echo('[[b;white;]COMMAND LIST:]\n' +
+                  '  scan network  - Discover devices on local network\n' +
+                  '  nmap [IP]     - Deep scan a specific IP\n' +
+                  '  brute [IP]    - Launch brute-force attack on Port 80\n' +
+                  '  clear         - Wipe terminal');
+    },
+
+    scan: function(target) {
+        if (target === 'network') {
+            this.echo('Scanning subnet 192.168.1.0/24...');
+            this.pause();
+            setTimeout(() => {
+                this.echo('\n[[b;white;]Devices Discovered:]');
+                this.echo('  > 192.168.1.1  (Unknown Vendor)');
+                this.echo('  > 192.168.1.15 (Dell-Workstation)');
+                this.echo('  > 192.168.1.42 (Apache-Linux-Server)');
+                this.resume();
+            }, 2000);
+        } else {
+            this.echo('Usage: scan network');
+        }
+    },
+
+    nmap: function(ip) {
+        if (!network[ip]) return this.echo('Error: No response from host ' + ip);
+        
+        this.echo('Starting Nmap 7.80 at ' + new Date().toLocaleTimeString());
+        this.pause();
+        
+        setTimeout(() => {
+            const host = network[ip];
+            this.echo('Scanning ' + ip + '...');
+            this.echo('Status: ' + host.status);
+            this.echo('Result: ' + host.ports);
+            if (host.vuln) {
+                this.echo('[[b;yellow;]VULNERABILITY FOUND:] Remote Login Enabled on Port 80.');
+            } else {
+                this.echo('[[b;red;]SECURITY CHECK:] Host is hardened. No entry points.');
+            }
+            this.resume();
+        }, 1500);
+    },
+
+    brute: function(ip) {
+        if (!ip || !network[ip]) return this.echo('Usage: brute [TARGET_IP]');
+        if (!network[ip].vuln) return this.echo('Error: No open login gateway found on ' + ip);
+
+        const term = this;
+        const wordlist = ['admin', '12345', 'qwerty', 'p@ssword123'];
+        term.echo('Starting Brute Force on ' + ip + ' Port 80...');
+        term.pause();
+
+        let i = 0;
+        const interval = setInterval(() => {
+            term.echo('Trying credential: ' + wordlist[i] + ' ... [[b;red;]ACCESS DENIED]');
+            
+            if (wordlist[i] === network[ip].pass) {
+                clearInterval(interval);
+                term.echo('Trying credential: ' + wordlist[i] + ' ... [[b;green;]LOGIN SUCCESSFUL]');
+                term.echo('\n[[b;white;]-- CONNECTION ESTABLISHED --]');
+                term.echo('Logged in as: root@web-server-42');
+                term.echo('Type "ls" to see server files...');
+                term.resume();
+                // We change the terminal's commands once logged in
+                term.push(function(cmd) {
+                    if (cmd === 'ls') term.echo('database.db  config.php  secret_plans.pdf');
+                    else if (cmd === 'exit') term.pop();
+                    else term.echo('root@web-server-42: command not found');
+                }, { prompt: 'root@web-server-42# ' });
+            }
+            i++;
+            if (i >= wordlist.length && !term.paused()) clearInterval(interval);
+        }, 1000);
+    }
+};
+
+$('body').terminal(commands, {
+    greetings: '[[b;green;]REECE-OS v3.0 (Net-Infiltrator)]\n' +
+               'Scanning for available uplinks... [OK]\n' +
+               'Type "help" to see available exploit tools.\n'
 });
 </script>
 </body>
