@@ -1,15 +1,20 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <style>
-        body { background-color: #0d1117; color: #39ff14; font-family: monospace; padding: 50px; }
-        .cursor { animation: blink 1s infinite; }
-        @keyframes blink { 50% { opacity: 0; } }
-    </style>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery.terminal/js/jquery.terminal.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery.terminal/css/jquery.terminal.min.css"/>
+    <style>body { margin: 0; height: 100vh; }</style>
 </head>
 <body>
-    <h1>> ACCESS_GRANTED</h1>
-    <p>User: reece6877</p>
-    <p>Status: Messing around...<span class="cursor">_</span></p>
+<script>
+$('body').terminal({
+    hello: function() { this.echo('Hello reece6877! Welcome to your terminal.'); },
+    whoami: function() { this.echo('You are a web developer in the making.'); },
+    help: function() { this.echo('Try: hello, whoami, or clear'); }
+}, {
+    greetings: 'REECE-OS v1.0\nType "help" to begin...'
+});
+</script>
 </body>
 </html>
