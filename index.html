@@ -3,117 +3,197 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>R6 Challenge Wheel</title>
+    <title>R6S Challenge Generator</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #0a0a12; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; overflow: hidden; }
-        #wheel-wrapper { position: relative; width: 500px; height: 500px; }
-        #wheel { width: 100%; height: 100%; transition: transform 4s cubic-bezier(0.1, 0, 0.2, 1); }
-        #pointer { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent; border-top: 40px solid #e94560; z-index: 10; filter: drop-shadow(0 0 5px rgba(233, 69, 96, 0.8)); }
-        .display { margin-top: 40px; text-align: center; height: 100px; }
-        #result { font-size: 2rem; color: #00d2ff; text-shadow: 0 0 10px #00d2ff; margin: 0; }
-        #desc { font-style: italic; color: #ccc; margin-top: 10px; }
-        button { margin-top: 30px; padding: 15px 50px; font-size: 1.5rem; cursor: pointer; background: #e94560; color: white; border: none; border-radius: 50px; font-weight: bold; box-shadow: 0 5px 15px rgba(233, 69, 96, 0.4); transition: 0.2s; }
-        button:hover { background: #ff4d6d; transform: scale(1.05); }
-        button:active { transform: scale(0.95); }
+        :root {
+            --r6-orange: #ffaa00;
+            --r6-dark: #1a1a1a;
+            --r6-gray: #2d2d2d;
+            --white: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--r6-dark);
+            color: var(--white);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
+
+        h1 {
+            border-bottom: 4px solid var(--r6-orange);
+            padding-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .generator-container {
+            background-color: var(--r6-gray);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            text-align: center;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .ops-display {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+            gap: 20px;
+        }
+
+        .op-card {
+            flex: 1;
+            background: #111;
+            padding: 15px;
+            border: 1px solid #444;
+            border-top: 5px solid var(--r6-orange);
+        }
+
+        .op-photo-box {
+            width: 100%;
+            height: 200px;
+            background-color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            border: 1px dashed #555;
+            overflow: hidden;
+        }
+
+        .op-photo-box img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .op-name {
+            font-weight: bold;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+        }
+
+        .op-type {
+            font-size: 0.8rem;
+            color: #888;
+        }
+
+        #challenge-display {
+            min-height: 100px;
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(255, 170, 0, 0.1);
+            border-left: 5px solid var(--r6-orange);
+            font-size: 1.1rem;
+            line-height: 1.5;
+        }
+
+        button {
+            background-color: var(--r6-orange);
+            color: black;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: transform 0.1s, background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: #ffc247;
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
     </style>
 </head>
 <body>
 
-    <div id="wheel-wrapper">
-        <div id="pointer"></div>
-        <svg id="wheel" viewBox="0 0 100 100"></svg>
-    </div>
+    <h1>R6S Squad Challenge</h1>
 
-    <div class="display">
-        <h2 id="result">Ready to Throw?</h2>
-        <p id="desc">Click the button to seal your fate.</p>
-    </div>
+    <div class="generator-container">
+        <div class="ops-display">
+            <div class="op-card">
+                <div class="op-photo-box" id="atk-photo">
+                    <span>Photo Placeholder</span>
+                </div>
+                <div class="op-name" id="atk-name">Attacker</div>
+                <div class="op-type">ATTACKER</div>
+            </div>
 
-    <button onclick="spin()">SPIN</button>
+            <div class="op-card">
+                <div class="op-photo-box" id="def-photo">
+                    <span>Photo Placeholder</span>
+                </div>
+                <div class="op-name" id="def-name">Defender</div>
+                <div class="op-type">DEFENDER</div>
+            </div>
+        </div>
+
+        <div id="challenge-display">
+            Click the button to generate a random challenge and operators!
+        </div>
+
+        <button onclick="generateChallenge()">Roll Random</button>
+    </div>
 
     <script>
-        const challenges = [
-            "The Turtle", "No Leaning", "Iron Sights", "1 Bullet Mag", "Hip-Fire", "The Worm", "Zero HUD", "Pistols Only", 
-            "Shotguns", "No Sprint", "Trigger Happy", "The Mirror", "No Intel", "Recruit Only", "Gadget Kill", "Soft Walls"
+        const attackers = [
+            "Sledge", "Thatcher", "Ash", "Thermite", "Twitch", "Montagne", "Glaz", "Fuze", "Blitz", "IQ", 
+            "Buck", "Blackbeard", "Capitão", "Hibana", "Jackal", "Ying", "Zofia", "Dokkaebi", "Lion", 
+            "Finka", "Maverick", "Nomad", "Gridlock", "Nøkk", "Amaru", "Kali", "Iana", "Ace", "Zero", 
+            "Flores", "Osa", "Sens", "Grim", "Brava", "Ram", "Deimos", "Striker", "Rauora", "Solid Snake"
         ];
-        
-        const descriptions = {
-            "The Turtle": "Shield ops only. Stay crouched all round.",
-            "No Leaning": "Unbind Q and E. Play stiff.",
-            "Iron Sights": "Remove all sights from your guns.",
-            "1 Bullet Mag": "Empty your mag to 1 bullet before every fight.",
-            "Hip-Fire": "Aiming Down Sights (ADS) is banned.",
-            "The Worm": "You must be prone to fire your weapon.",
-            "Zero HUD": "Turn off your HUD in settings.",
-            "Pistols Only": "Primary weapons are forbidden.",
-            "Shotguns": "Your whole squad must use shotguns.",
-            "No Sprint": "Never press the sprint key.",
-            "Trigger Happy": "Once you start firing, don't stop until the mag is empty.",
-            "The Mirror": "Play the Op that killed you last round.",
-            "No Intel": "Don't look at cameras or drones at all.",
-            "Recruit Only": "Pick an Op, but you can't use their gadget.",
-            "Gadget Kill": "Your first kill must be with a gadget/melee.",
-            "Soft Walls": "You must reinforce absolutely nothing."
-        };
 
-        const wheel = document.getElementById('wheel');
-        const numSlices = challenges.length;
-        const sliceAngle = 360 / numSlices;
+        const defenders = [
+            "Smoke", "Mute", "Castle", "Pulse", "Doc", "Rook", "Kapkan", "Tachanka", "Jäger", "Bandit", 
+            "Frost", "Valkyrie", "Caveira", "Echo", "Mira", "Lesion", "Ela", "Vigil", "Maestro", "Alibi", 
+            "Clash", "Kaid", "Mozzie", "Warden", "Goyo", "Wamai", "Oryx", "Melusi", "Aruni", "Thunderbird", 
+            "Thorn", "Azami", "Solis", "Fenrir", "Tubarão", "Sentry", "Skopós"
+        ];
 
-        // Create the SVG slices
-        challenges.forEach((text, i) => {
-            const angle = i * sliceAngle;
-            const x1 = 50 + 50 * Math.cos(Math.PI * (angle - 90) / 180);
-            const y1 = 50 + 50 * Math.sin(Math.PI * (angle - 90) / 180);
-            const x2 = 50 + 50 * Math.cos(Math.PI * (angle + sliceAngle - 90) / 180);
-            const y2 = 50 + 50 * Math.sin(Math.PI * (angle + sliceAngle - 90) / 180);
-            
-            const pathData = `M 50 50 L ${x1} ${y1} A 50 50 0 0 1 ${x2} ${y2} Z`;
-            const color = i % 2 === 0 ? '#16213e' : '#0f3460';
-            
-            // Create slice
-            const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-            path.setAttribute("d", pathData);
-            path.setAttribute("fill", color);
-            path.setAttribute("stroke", "#00d2ff");
-            path.setAttribute("stroke-width", "0.2");
-            wheel.appendChild(path);
+        const challenges = [
+            "**Iron Sights Only:** Remove all optics from your weapons. You must win the match using only standard iron sights.",
+            "**Pistol/Secondary Only:** You are only allowed to use your secondary weapon for the entire match.",
+            "**The Pacifist Medic:** Play Doc and your only goal is to stim teammates and, if you're feeling crazy, try to stim an enemy without getting shot.",
+            "**Hide & Seek Mira:** As Mira, find a corner on the site (or even off-site) and just watch people walk by through your mirror without shooting them.",
+            "**The Kap-Man:** Place all of Kapkan's traps on a single door or window to create a massive firework show.",
+            "**Shield Rush:** Get your squad to all pick shield operators (Blitz, Montagne, Fuze with shield) and rush the objective.",
+            "**The Backpack:** One plays Montagne, the other a high-power op (Ash/Zofia). The shooter stays directly behind Monty. If Monty dies, the shooter prones until death.",
+            "**The Floor is Lava:** Both pick operators with shotguns. You are never allowed to touch the floor of the objective room. Stay on hatches, furniture, or hallways.",
+            "**The Distraction Duo:** One person makes extreme noise on one side; the other sneaks into objective from the opposite side using only a suppressed pistol.",
+            "**The Recruit Experience:** No unique gadgets. Use only primary weapon. If you use a gadget by accident, stare at a wall for 10 seconds as punishment.",
+            "**Luddite Mode:** No electronic gadgets. No drones, cams, scanners, or hacking. If it has a battery, it’s banned.",
+            "**The Heavyweight:** No sprinting and no vaulting. Walk everywhere. You must find a door or blow a hole to get through obstacles.",
+            "**The 'Stay Together' Tether:** You and your partner must stay within 5 meters. If the tether breaks, stop moving until you are touching again.",
+            "**The 'Silent But Deadly':** No primary weapons and no sprinting. Suppressed secondaries only. If spotted, you must retreat.",
+            "**Utility Only:** No guns allowed until the final 45 seconds of the round. Use only secondary gadgets (flashes/smokes) for the first 2 minutes."
+        ];
 
-            // Create text
-            const textPath = document.createElementNS("http://www.w3.org/2000/svg", "text");
-            const textAngle = angle + (sliceAngle / 2);
-            textPath.setAttribute("x", "50");
-            textPath.setAttribute("y", "15");
-            textPath.setAttribute("fill", "white");
-            textPath.setAttribute("font-size", "2.5");
-            textPath.setAttribute("font-weight", "bold");
-            textPath.setAttribute("text-anchor", "middle");
-            textPath.setAttribute("transform", `rotate(${textAngle}, 50, 50)`);
-            textPath.textContent = text;
-            wheel.appendChild(textPath);
-        });
+        function generateChallenge() {
+            // Randomly select items
+            const randomAtk = attackers[Math.floor(Math.random() * attackers.length)];
+            const randomDef = defenders[Math.floor(Math.random() * defenders.length)];
+            const randomChal = challenges[Math.floor(Math.random() * challenges.length)];
 
-        let rotation = 0;
-        function spin() {
-            const extraSpins = 5 + Math.floor(Math.random() * 5);
-            const randomStop = Math.floor(Math.random() * 360);
-            rotation += (extraSpins * 360) + randomStop;
-            
-            const wheelEl = document.getElementById('wheel');
-            wheelEl.style.transform = `rotate(${rotation}deg)`;
+            // Update Text
+            document.getElementById('atk-name').innerText = randomAtk;
+            document.getElementById('def-name').innerText = randomDef;
+            document.getElementById('challenge-display').innerHTML = randomChal;
 
-            document.getElementById('result').innerText = "CALCULATING...";
-            document.getElementById('desc').innerText = "";
-
-            setTimeout(() => {
-                // Calculate which slice is at the top (0 degrees)
-                const actualDegree = (360 - (rotation % 360)) % 360;
-                const index = Math.floor(actualDegree / sliceAngle);
-                const challenge = challenges[index];
-                
-                document.getElementById('result').innerText = challenge;
-                document.getElementById('desc').innerText = descriptions[challenge];
-            }, 4000);
+            // Update Photos (Placeholder Logic)
+            // To add real photos, name your images like "Ash.png" and use:
+            // document.getElementById('atk-photo').innerHTML = `<img src="images/${randomAtk}.png" alt="${randomAtk}">`;
+            document.getElementById('atk-photo').innerHTML = `<span>[${randomAtk} Photo]</span>`;
+            document.getElementById('def-photo').innerHTML = `<span>[${randomDef} Photo]</span>`;
         }
     </script>
 </body>
