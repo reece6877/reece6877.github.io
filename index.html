@@ -3,139 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fake Terminal Simulator</title>
+    <title>R6 Random Challenge Wheel</title>
     <style>
-        body {
-            background-color: #000;
-            color: #0f0;
-            font-family: 'Courier New', monospace;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-        #terminal {
-            width: 80%;
-            height: 80%;
-            background-color: #111;
-            border: 1px solid #0f0;
-            padding: 10px;
-            overflow-y: auto;
-            box-shadow: 0 0 10px #0f0;
-        }
-        #output {
-            white-space: pre-wrap;
-            word-wrap: break-word;
-        }
-        #input {
-            width: 100%;
-            background: none;
-            border: none;
-            color: #0f0;
-            font-family: inherit;
-            outline: none;
-        }
-        .prompt {
-            color: #0f0;
-        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #1a1a2e; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        #wheel-container { position: relative; width: 350px; height: 350px; border: 5px solid #00d2ff; border-radius: 50%; display: flex; align-items: center; justify-content: center; overflow: hidden; transition: transform 4s cubic-bezier(0.1, 0, 0.1, 1); }
+        #pointer { position: absolute; top: -10px; width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 30px solid #00d2ff; z-index: 10; }
+        .challenge-display { margin-top: 30px; text-align: center; padding: 20px; background: #16213e; border-radius: 10px; width: 80%; max-width: 500px; min-height: 80px; border: 2px solid #0f3460; }
+        button { margin-top: 20px; padding: 15px 40px; font-size: 1.2rem; cursor: pointer; background: #e94560; color: white; border: none; border-radius: 5px; font-weight: bold; text-transform: uppercase; }
+        button:hover { background: #ff4d6d; }
+        h1 { color: #00d2ff; text-transform: uppercase; letter-spacing: 2px; }
     </style>
 </head>
 <body>
-    <div id="terminal">
-        <div id="output"></div>
-        <span class="prompt">user@fake-terminal:~$ </span><input type="text" id="input" autofocus>
+
+    <h1>R6 Strat Roulette</h1>
+    <div id="pointer"></div>
+    <div id="wheel-container">
+        <div style="width: 100%; height: 100%; background: repeating-conic-gradient(#0f3460 0 15deg, #16213e 0 30deg);"></div>
     </div>
 
+    <div class="challenge-display">
+        <h2 id="challenge-text">Click Spin to start the chaos...</h2>
+        <p id="challenge-desc"></p>
+    </div>
+
+    <button onclick="spinWheel()">SPIN THE WHEEL</button>
+
     <script>
-        const output = document.getElementById('output');
-        const input = document.getElementById('input');
-        const terminal = document.getElementById('terminal');
+        const challenges = [
+            { title: "The Turtle", desc: "Shield ops only. You must stay crouched the entire round." },
+            { title: "No Leaning", desc: "Unbind your Q and E keys (or just don't touch them). Play straight up." },
+            { title: "The Recruit Spirit", desc: "Iron sights only. No attachments allowed on any primary." },
+            { title: "One Bullet Dream", desc: "Empty your mag to 1 bullet at the start of every encounter. Good luck." },
+            { title: "Hip-Fire Only", desc: "Aiming down sights is forbidden. Spray and pray." },
+            { title: "The Worm", desc: "You must be prone to shoot. If you're standing/crouched, you can't fire." },
+            { title: "Gadget Fatality", desc: "You must use/destroy all of your utility within the first 30 seconds." },
+            { title: "The Blind Monk", desc: "Turn your brightness to 0 or play with your HUD completely off." },
+            { title: "Secondary Specialist", desc: "Pistols/Secondaries only. Your primary gun is decorative." },
+            { title: "Shotgun Party", desc: "Whole team must run shotguns. No exceptions." },
+            { title: "The Moonwalker", desc: "You can only move backwards or sideways. No forward key." },
+            { title: "T-Bag Bonanza", desc: "Every time you see an enemy, you must T-bag before you can shoot." },
+            { title: "Ghost Hunter", desc: "Follow an enemy without them seeing you for as long as possible before killing." },
+            { title: "No Sprinting", desc: "Your shift key is broken. Walk everywhere like a horror movie villain." },
+            { title: "Trigger Happy", desc: "Once you start shooting, you cannot stop until the mag is empty." },
+            { title: "The Mirror", desc: "You must use the exact same operator that killed you last round." }
+        ];
 
-        // Simulated installed tools
-        let installedTools = new Set();
+        let currentRotation = 0;
 
-        // Fake data for tools
-        const fakeIPs = ['192.168.1.1', '10.0.0.1', '172.16.0.1', '8.8.8.8', '1.1.1.1'];
-        const fakePorts = [80, 443, 22, 21, 3389];
+        function spinWheel() {
+            const wheel = document.getElementById('wheel-container');
+            const title = document.getElementById('challenge-text');
+            const desc = document.getElementById('challenge-desc');
+            
+            // Random spin animation
+            const addedRotation = 1440 + Math.floor(Math.random() * 360);
+            currentRotation += addedRotation;
+            wheel.style.transform = `rotate(${currentRotation}deg)`;
 
-        // Command handlers
-        const commands = {
-            help: () => {
-                return 'Available commands:\n' +
-                       'help - show this help\n' +
-                       'install <tool> - fake install a tool (e.g., nmap, hydra)\n' +
-                       'nmap <target> - fake nmap scan\n' +
-                       'hydra <target> - fake brute force with hydra\n' +
-                       'ls - list fake directory\n' +
-                       'clear - clear the screen\n';
-            },
-            install: (args) => {
-                if (args.length < 1) return 'Usage: install <tool>';
-                const tool = args[0].toLowerCase();
-                installedTools.add(tool);
-                return `Fake installing ${tool}... Done! (Nothing actually installed)`;
-            },
-            nmap: (args) => {
-                if (!installedTools.has('nmap')) return 'nmap not installed. Use "install nmap" first.';
-                if (args.length < 1) return 'Usage: nmap <target>';
-                const target = args[0];
-                let result = `Starting fake Nmap scan on ${target}\n`;
-                result += 'Host is up (0.001s latency).\n';
-                fakeIPs.forEach(ip => {
-                    result += `Discovered fake IP: ${ip}\n`;
-                });
-                fakePorts.forEach(port => {
-                    result += `Port ${port}/tcp open (fake service)\n`;
-                });
-                return result + 'Fake Nmap done: 1 IP address scanned in 0.01 seconds';
-            },
-            hydra: (args) => {
-                if (!installedTools.has('hydra')) return 'hydra not installed. Use "install hydra" first.';
-                if (args.length < 1) return 'Usage: hydra <target>';
-                const target = args[0];
-                return `Starting fake brute force on ${target}...\n` +
-                       'Trying fake passwords...\n' +
-                       '[FAKE] [ssh] host: 192.168.1.1   login: admin   password: password123\n' +
-                       '[FAKE] [http] host: 10.0.0.1   login: user   password: letmein\n' +
-                       'Fake brute force complete. (No real attempts made)';
-            },
-            ls: () => {
-                return 'fake_file.txt  pretend_dir/  imaginary_script.sh';
-            },
-            clear: () => {
-                output.innerHTML = '';
-                return '';
-            }
-        };
+            // Pick challenge
+            title.innerText = "Spinning...";
+            desc.innerText = "";
 
-        input.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                const commandLine = input.value.trim();
-                output.innerHTML += `<div class="prompt">user@fake-terminal:~$ </div>${commandLine}\n`;
-                
-                const [cmd, ...args] = commandLine.split(/\s+/);
-                const lowerCmd = cmd.toLowerCase();
-                
-                let result = 'Command not found: ' + cmd;
-                if (commands[lowerCmd]) {
-                    result = commands[lowerCmd](args);
-                }
-                
-                if (result) {
-                    output.innerHTML += result + '\n';
-                }
-                
-                input.value = '';
-                terminal.scrollTop = terminal.scrollHeight;
-            }
-        });
-
-        // Initial welcome message
-        output.innerHTML = 'Welcome to Fake Terminal Simulator\n' +
-                           'This is a purely simulated environment. Nothing here is real or functional.\n' +
-                           'Type "help" for available commands.\n\n';
+            setTimeout(() => {
+                const randomChallenge = challenges[Math.floor(Math.random() * challenges.length)];
+                title.innerText = randomChallenge.title;
+                desc.innerText = randomChallenge.desc;
+            }, 4000);
+        }
     </script>
 </body>
 </html>
