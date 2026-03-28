@@ -3,72 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>R6 Random Challenge Wheel</title>
+    <title>R6 Challenge Wheel</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #1a1a2e; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-        #wheel-container { position: relative; width: 350px; height: 350px; border: 5px solid #00d2ff; border-radius: 50%; display: flex; align-items: center; justify-content: center; overflow: hidden; transition: transform 4s cubic-bezier(0.1, 0, 0.1, 1); }
-        #pointer { position: absolute; top: -10px; width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 30px solid #00d2ff; z-index: 10; }
-        .challenge-display { margin-top: 30px; text-align: center; padding: 20px; background: #16213e; border-radius: 10px; width: 80%; max-width: 500px; min-height: 80px; border: 2px solid #0f3460; }
-        button { margin-top: 20px; padding: 15px 40px; font-size: 1.2rem; cursor: pointer; background: #e94560; color: white; border: none; border-radius: 5px; font-weight: bold; text-transform: uppercase; }
-        button:hover { background: #ff4d6d; }
-        h1 { color: #00d2ff; text-transform: uppercase; letter-spacing: 2px; }
+        body { font-family: 'Segoe UI', sans-serif; background: #0a0a12; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; overflow: hidden; }
+        #wheel-wrapper { position: relative; width: 500px; height: 500px; }
+        #wheel { width: 100%; height: 100%; transition: transform 4s cubic-bezier(0.1, 0, 0.2, 1); }
+        #pointer { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent; border-top: 40px solid #e94560; z-index: 10; filter: drop-shadow(0 0 5px rgba(233, 69, 96, 0.8)); }
+        .display { margin-top: 40px; text-align: center; height: 100px; }
+        #result { font-size: 2rem; color: #00d2ff; text-shadow: 0 0 10px #00d2ff; margin: 0; }
+        #desc { font-style: italic; color: #ccc; margin-top: 10px; }
+        button { margin-top: 30px; padding: 15px 50px; font-size: 1.5rem; cursor: pointer; background: #e94560; color: white; border: none; border-radius: 50px; font-weight: bold; box-shadow: 0 5px 15px rgba(233, 69, 96, 0.4); transition: 0.2s; }
+        button:hover { background: #ff4d6d; transform: scale(1.05); }
+        button:active { transform: scale(0.95); }
     </style>
 </head>
 <body>
 
-    <h1>R6 Strat Roulette</h1>
-    <div id="pointer"></div>
-    <div id="wheel-container">
-        <div style="width: 100%; height: 100%; background: repeating-conic-gradient(#0f3460 0 15deg, #16213e 0 30deg);"></div>
+    <div id="wheel-wrapper">
+        <div id="pointer"></div>
+        <svg id="wheel" viewBox="0 0 100 100"></svg>
     </div>
 
-    <div class="challenge-display">
-        <h2 id="challenge-text">Click Spin to start the chaos...</h2>
-        <p id="challenge-desc"></p>
+    <div class="display">
+        <h2 id="result">Ready to Throw?</h2>
+        <p id="desc">Click the button to seal your fate.</p>
     </div>
 
-    <button onclick="spinWheel()">SPIN THE WHEEL</button>
+    <button onclick="spin()">SPIN</button>
 
     <script>
         const challenges = [
-            { title: "The Turtle", desc: "Shield ops only. You must stay crouched the entire round." },
-            { title: "No Leaning", desc: "Unbind your Q and E keys (or just don't touch them). Play straight up." },
-            { title: "The Recruit Spirit", desc: "Iron sights only. No attachments allowed on any primary." },
-            { title: "One Bullet Dream", desc: "Empty your mag to 1 bullet at the start of every encounter. Good luck." },
-            { title: "Hip-Fire Only", desc: "Aiming down sights is forbidden. Spray and pray." },
-            { title: "The Worm", desc: "You must be prone to shoot. If you're standing/crouched, you can't fire." },
-            { title: "Gadget Fatality", desc: "You must use/destroy all of your utility within the first 30 seconds." },
-            { title: "The Blind Monk", desc: "Turn your brightness to 0 or play with your HUD completely off." },
-            { title: "Secondary Specialist", desc: "Pistols/Secondaries only. Your primary gun is decorative." },
-            { title: "Shotgun Party", desc: "Whole team must run shotguns. No exceptions." },
-            { title: "The Moonwalker", desc: "You can only move backwards or sideways. No forward key." },
-            { title: "T-Bag Bonanza", desc: "Every time you see an enemy, you must T-bag before you can shoot." },
-            { title: "Ghost Hunter", desc: "Follow an enemy without them seeing you for as long as possible before killing." },
-            { title: "No Sprinting", desc: "Your shift key is broken. Walk everywhere like a horror movie villain." },
-            { title: "Trigger Happy", desc: "Once you start shooting, you cannot stop until the mag is empty." },
-            { title: "The Mirror", desc: "You must use the exact same operator that killed you last round." }
+            "The Turtle", "No Leaning", "Iron Sights", "1 Bullet Mag", "Hip-Fire", "The Worm", "Zero HUD", "Pistols Only", 
+            "Shotguns", "No Sprint", "Trigger Happy", "The Mirror", "No Intel", "Recruit Only", "Gadget Kill", "Soft Walls"
         ];
+        
+        const descriptions = {
+            "The Turtle": "Shield ops only. Stay crouched all round.",
+            "No Leaning": "Unbind Q and E. Play stiff.",
+            "Iron Sights": "Remove all sights from your guns.",
+            "1 Bullet Mag": "Empty your mag to 1 bullet before every fight.",
+            "Hip-Fire": "Aiming Down Sights (ADS) is banned.",
+            "The Worm": "You must be prone to fire your weapon.",
+            "Zero HUD": "Turn off your HUD in settings.",
+            "Pistols Only": "Primary weapons are forbidden.",
+            "Shotguns": "Your whole squad must use shotguns.",
+            "No Sprint": "Never press the sprint key.",
+            "Trigger Happy": "Once you start firing, don't stop until the mag is empty.",
+            "The Mirror": "Play the Op that killed you last round.",
+            "No Intel": "Don't look at cameras or drones at all.",
+            "Recruit Only": "Pick an Op, but you can't use their gadget.",
+            "Gadget Kill": "Your first kill must be with a gadget/melee.",
+            "Soft Walls": "You must reinforce absolutely nothing."
+        };
 
-        let currentRotation = 0;
+        const wheel = document.getElementById('wheel');
+        const numSlices = challenges.length;
+        const sliceAngle = 360 / numSlices;
 
-        function spinWheel() {
-            const wheel = document.getElementById('wheel-container');
-            const title = document.getElementById('challenge-text');
-            const desc = document.getElementById('challenge-desc');
+        // Create the SVG slices
+        challenges.forEach((text, i) => {
+            const angle = i * sliceAngle;
+            const x1 = 50 + 50 * Math.cos(Math.PI * (angle - 90) / 180);
+            const y1 = 50 + 50 * Math.sin(Math.PI * (angle - 90) / 180);
+            const x2 = 50 + 50 * Math.cos(Math.PI * (angle + sliceAngle - 90) / 180);
+            const y2 = 50 + 50 * Math.sin(Math.PI * (angle + sliceAngle - 90) / 180);
             
-            // Random spin animation
-            const addedRotation = 1440 + Math.floor(Math.random() * 360);
-            currentRotation += addedRotation;
-            wheel.style.transform = `rotate(${currentRotation}deg)`;
+            const pathData = `M 50 50 L ${x1} ${y1} A 50 50 0 0 1 ${x2} ${y2} Z`;
+            const color = i % 2 === 0 ? '#16213e' : '#0f3460';
+            
+            // Create slice
+            const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            path.setAttribute("d", pathData);
+            path.setAttribute("fill", color);
+            path.setAttribute("stroke", "#00d2ff");
+            path.setAttribute("stroke-width", "0.2");
+            wheel.appendChild(path);
 
-            // Pick challenge
-            title.innerText = "Spinning...";
-            desc.innerText = "";
+            // Create text
+            const textPath = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            const textAngle = angle + (sliceAngle / 2);
+            textPath.setAttribute("x", "50");
+            textPath.setAttribute("y", "15");
+            textPath.setAttribute("fill", "white");
+            textPath.setAttribute("font-size", "2.5");
+            textPath.setAttribute("font-weight", "bold");
+            textPath.setAttribute("text-anchor", "middle");
+            textPath.setAttribute("transform", `rotate(${textAngle}, 50, 50)`);
+            textPath.textContent = text;
+            wheel.appendChild(textPath);
+        });
+
+        let rotation = 0;
+        function spin() {
+            const extraSpins = 5 + Math.floor(Math.random() * 5);
+            const randomStop = Math.floor(Math.random() * 360);
+            rotation += (extraSpins * 360) + randomStop;
+            
+            const wheelEl = document.getElementById('wheel');
+            wheelEl.style.transform = `rotate(${rotation}deg)`;
+
+            document.getElementById('result').innerText = "CALCULATING...";
+            document.getElementById('desc').innerText = "";
 
             setTimeout(() => {
-                const randomChallenge = challenges[Math.floor(Math.random() * challenges.length)];
-                title.innerText = randomChallenge.title;
-                desc.innerText = randomChallenge.desc;
+                // Calculate which slice is at the top (0 degrees)
+                const actualDegree = (360 - (rotation % 360)) % 360;
+                const index = Math.floor(actualDegree / sliceAngle);
+                const challenge = challenges[index];
+                
+                document.getElementById('result').innerText = challenge;
+                document.getElementById('desc').innerText = descriptions[challenge];
             }, 4000);
         }
     </script>
