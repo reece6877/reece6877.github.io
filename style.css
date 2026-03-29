@@ -1,28 +1,107 @@
+:root {
+    --atk: #e87820;
+    --atk-dim: rgba(232,120,32,0.15);
+    --atk-glow: rgba(232,120,32,0.4);
+    --def: #1e8fff;
+    --def-dim: rgba(30,143,255,0.15);
+    --def-glow: rgba(30,143,255,0.4);
+    --bg: #0a0a0c;
+    --surface: #111116;
+    --surface2: #18181f;
+    --text: #e8e8f0;
+    --muted: #6b6b80;
+    --line: #22222e;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+}
+
+header { width: 100%; text-align: center; padding: 2.5rem 1rem 1rem; position: relative; z-index: 1; }
+.title-badge { font-family: 'Share Tech Mono', monospace; font-size: 0.65rem; letter-spacing: 0.3em; color: var(--muted); text-transform: uppercase; margin-bottom: 0.5rem; }
+h1 { font-size: clamp(1.8rem, 6vw, 3rem); font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; background: linear-gradient(90deg, var(--atk) 0%, #fff 40%, #fff 60%, var(--def) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1.1; }
+.divider { width: 120px; height: 2px; background: linear-gradient(90deg, var(--atk), var(--def)); margin: 1rem auto; border-radius: 2px; }
+
+main { width: 100%; max-width: 900px; padding: 0 1rem 3rem; position: relative; z-index: 1; }
+
+.operators-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; }
+.op-card { background: var(--surface); border-radius: 4px; padding: 1.5rem 1rem; display: flex; flex-direction: column; align-items: center; gap: 0.75rem; position: relative; overflow: hidden; transition: transform 0.2s; }
+.op-card.attacker { border: 1px solid var(--atk); box-shadow: 0 0 20px var(--atk-dim); }
+.op-card.defender { border: 1px solid var(--def); box-shadow: 0 0 20px var(--def-dim); }
+
+.op-role { font-family: 'Share Tech Mono', monospace; font-size: 0.6rem; letter-spacing: 0.25em; text-transform: uppercase; }
+.attacker .op-role { color: var(--atk); }
+.defender .op-role { color: var(--def); }
+
+/* Circle container for the images */
 .op-icon {
-    width: 80px;
-    height: 80px;
+    width: 85px;
+    height: 85px;
     border-radius: 50%;
-    overflow: hidden; /* This crops the 300x500 image into a circle */
-    background: var(--surface2);
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 2px solid transparent;
+    background: var(--surface2);
+    overflow: hidden;
+    position: relative;
+    font-weight: 700;
 }
 
-.attacker .op-icon { border-color: var(--atk); }
-.defender .op-icon { border-color: var(--def); }
+.attacker .op-icon { border: 2px solid var(--atk); color: var(--atk); }
+.defender .op-icon { border: 2px solid var(--def); color: var(--def); }
 
+/* The specific fix for your 300x500 images */
 .op-img {
     width: 100%;
     height: 100%;
-    /* 'cover' makes sure there are no gaps. 
-       'top' ensures we see the head/face instead of the waist. */
-    object-fit: cover;
-    object-position: top center; 
-    transition: transform 0.3s ease;
+    object-fit: cover; /* Fills the circle */
+    object-position: top center; /* Centers on the face */
 }
 
-.op-card:hover .op-img {
-    transform: scale(1.1);
-}
+.op-name { font-size: 1.4rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; text-align: center; }
+.attacker .op-name { color: var(--atk); text-shadow: 0 0 12px var(--atk-glow); }
+.defender .op-name { color: var(--def); text-shadow: 0 0 12px var(--def-glow); }
+
+.challenges-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; }
+.challenge-card { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 1.25rem; position: relative; min-height: 110px; display: flex; flex-direction: column; gap: 0.4rem; }
+.challenge-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; }
+.challenge-card.p1::before { background: var(--atk); }
+.challenge-card.p2::before { background: var(--def); }
+.challenge-label { font-family: 'Share Tech Mono', monospace; font-size: 0.6rem; letter-spacing: 0.25em; text-transform: uppercase; }
+.challenge-card.p1 .challenge-label { color: var(--atk); }
+.challenge-card.p2 .challenge-label { color: var(--def); }
+.challenge-name { font-size: 1rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text); }
+.challenge-desc { font-size: 0.85rem; color: #a0a0b8; line-height: 1.4; }
+
+.btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+.btn { padding: 1rem; font-family: 'Rajdhani', sans-serif; font-size: 0.95rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; border: none; border-radius: 4px; cursor: pointer; transition: 0.2s; }
+.btn-full { background: var(--atk); color: #fff; box-shadow: 0 4px 20px var(--atk-glow); }
+.btn-challenge { background: var(--surface2); color: var(--text); border: 1px solid var(--line); }
+
+@keyframes pop { 50% { transform: scale(1.05); } }
+.pop { animation: pop 0.3s ease; }
+@keyframes fadeSlide { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.anim { animation: fadeSlide 0.3s ease forwards; }
+
+footer { padding: 1.5rem; font-family: 'Share Tech Mono'; font-size: 0.6rem; color: var(--muted); text-align: center; }
