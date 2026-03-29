@@ -1,263 +1,470 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>R6S Squad Challenges</title>
-    <style>
-        :root { 
-            --r6-orange: #ffaa00; 
-            --r6-dark: #121212; 
-            --r6-gray: #1e1e1e; 
-            --white: #ffffff;
-            /* Official Team Colors */
-            --atk-blue: #0088ff;
-            --def-orange: #ff7700;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>R6S Squad Challenges</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            /* Added a subtle Siege pattern and made it super dark */
-            background-color: var(--r6-dark);
-            background-image: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)), 
-                              url('https://placehold.co/1920x1080?text=Siege+UI+Pattern');
-            color: var(--white); 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            padding: 20px; 
-            margin: 0; 
-            min-height: 100vh;
-        }
+  :root {
+    --atk: #e87820;
+    --atk-dim: rgba(232,120,32,0.15);
+    --atk-glow: rgba(232,120,32,0.4);
+    --def: #1e8fff;
+    --def-dim: rgba(30,143,255,0.15);
+    --def-glow: rgba(30,143,255,0.4);
+    --bg: #0a0a0c;
+    --surface: #111116;
+    --surface2: #18181f;
+    --text: #e8e8f0;
+    --muted: #6b6b80;
+    --line: #22222e;
+  }
 
-        h1 { 
-            border-bottom: 4px solid var(--r6-orange); 
-            padding-bottom: 10px; 
-            text-transform: uppercase; 
-            letter-spacing: 4px; 
-            margin-bottom: 40px; 
-            text-shadow: 0 0 10px rgba(255,170,0,0.3);
-        }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
+  }
 
-        .generator-container { 
-            background-color: var(--r6-gray); 
-            padding: 40px; 
-            border-radius: 12px; 
-            box-shadow: 0 15px 50px rgba(0,0,0,0.7); 
-            text-align: center; 
-            max-width: 900px; 
-            width: 100%; 
-            border: 1px solid #333; 
-        }
+  /* Background grid */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
 
-        .ops-display { 
-            display: flex; 
-            justify-content: space-around; 
-            margin-bottom: 30px; 
-            gap: 30px; 
-        }
+  header {
+    width: 100%;
+    text-align: center;
+    padding: 2.5rem 1rem 1rem;
+    position: relative;
+    z-index: 1;
+  }
 
-        .op-card { 
-            flex: 1; 
-            /* The key new styling is here */
-            background: #000; /* Super dark card base */
-            padding: 20px; 
-            border-radius: 4px; 
-            border: 2px solid transparent; 
-            transition: all 0.3s;
-        }
+  .title-badge {
+    display: inline-block;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
 
-        /* Distinctive lighting for the roles */
-        .op-card.atk-type { 
-            border-color: var(--atk-blue); 
-            box-shadow: 0 0 20px rgba(0,136,255,0.15); 
-        }
-        .op-card.def-type { 
-            border-color: var(--def-orange); 
-            box-shadow: 0 0 20px rgba(255,119,0,0.15); 
-        }
+  h1 {
+    font-size: clamp(1.8rem, 6vw, 3rem);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    background: linear-gradient(90deg, var(--atk) 0%, #fff 40%, #fff 60%, var(--def) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.1;
+  }
 
-        .op-photo-box { 
-            width: 100%; 
-            height: 300px; 
-            background-color: #080808; /* Even darker photo background */
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            margin-bottom: 15px; 
-            border: 1px solid #222; 
-            overflow: hidden; 
-            border-radius: 2px;
-        }
+  .divider {
+    width: 120px;
+    height: 2px;
+    background: linear-gradient(90deg, var(--atk), var(--def));
+    margin: 1rem auto;
+    border-radius: 2px;
+  }
 
-        .op-photo-box img { 
-            width: 100%; 
-            height: 100%; 
-            object-fit: contain; 
-        }
+  /* Main content */
+  main {
+    width: 100%;
+    max-width: 900px;
+    padding: 0 1rem 3rem;
+    position: relative;
+    z-index: 1;
+  }
 
-        .op-name { 
-            font-weight: bold; 
-            font-size: 1.4rem; 
-            text-transform: uppercase; 
-            letter-spacing: 2px; 
-            margin-bottom: 5px;
-        }
+  /* Operators grid */
+  .operators-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
 
-        /* Team names now match team colors */
-        .atk-type .op-name { color: var(--atk-blue); text-shadow: 0 0 5px rgba(0,136,255,0.4); }
-        .def-type .op-name { color: var(--def-orange); text-shadow: 0 0 5px rgba(255,119,0,0.4); }
+  .op-card {
+    background: var(--surface);
+    border-radius: 4px;
+    padding: 1.5rem 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s;
+  }
 
-        #challenge-display { 
-            min-height: 80px; 
-            margin: 20px 0; 
-            padding: 25px; 
-            background: rgba(255, 170, 0, 0.05); 
-            border-left: 5px solid var(--r6-orange); 
-            font-size: 1.15rem; 
-            line-height: 1.6; 
-            text-align: left; 
-            color: #ccc;
-            border-radius: 4px;
-        }
+  .op-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
 
-        .btn-group { 
-            display: flex; 
-            gap: 15px; 
-            justify-content: center; 
-            flex-wrap: wrap; 
-        }
+  .op-card.attacker {
+    border: 1px solid var(--atk);
+    box-shadow: 0 0 20px var(--atk-dim), inset 0 0 20px var(--atk-dim);
+  }
 
-        button { 
-            background-color: var(--r6-orange); 
-            color: black; 
-            border: none; 
-            padding: 18px 35px; 
-            font-size: 1.1rem; 
-            font-weight: bold; 
-            cursor: pointer; 
-            text-transform: uppercase; 
-            letter-spacing: 1px;
-            transition: 0.2s; 
-            border-radius: 2px;
-        }
+  .op-card.attacker::before {
+    background: var(--atk-dim);
+  }
 
-        button:hover { 
-            background-color: #ffc247; 
-            transform: translateY(-2px); 
-            box-shadow: 0 5px 15px rgba(255,170,0,0.3);
-        }
+  .op-card.defender {
+    border: 1px solid var(--def);
+    box-shadow: 0 0 20px var(--def-dim), inset 0 0 20px var(--def-dim);
+  }
 
-        button.secondary { 
-            background-color: #333; 
-            color: white; 
-            border: 1px solid #444;
-        }
-        button.secondary:hover { 
-            background-color: #444; 
-        }
-    </style>
+  .op-card.defender::before {
+    background: var(--def-dim);
+  }
+
+  .op-card.pop::before { opacity: 1; }
+  .op-card.pop { transform: scale(1.02); }
+
+  .op-role {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+  }
+
+  .attacker .op-role { color: var(--atk); }
+  .defender .op-role { color: var(--def); }
+
+  .op-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    font-weight: 700;
+    position: relative;
+  }
+
+  .attacker .op-icon {
+    background: var(--atk-dim);
+    border: 2px solid var(--atk);
+    color: var(--atk);
+    box-shadow: 0 0 16px var(--atk-glow);
+  }
+
+  .defender .op-icon {
+    background: var(--def-dim);
+    border: 2px solid var(--def);
+    color: var(--def);
+    box-shadow: 0 0 16px var(--def-glow);
+  }
+
+  .op-name {
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-align: center;
+  }
+
+  .attacker .op-name { color: var(--atk); text-shadow: 0 0 12px var(--atk-glow); }
+  .defender .op-name { color: var(--def); text-shadow: 0 0 12px var(--def-glow); }
+
+  /* Challenge cards */
+  .challenges-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+    .challenge-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 1.25rem 1rem 1.25rem 1.25rem;
+    position: relative;
+    overflow: hidden;
+    min-height: 110px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 0.4rem;
+  }
+
+  .challenge-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+  }
+
+  .challenge-card.p1::before { background: var(--atk); }
+  .challenge-card.p2::before { background: var(--def); }
+
+  .challenge-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+  }
+
+  .challenge-card.p1 .challenge-label { color: var(--atk); }
+  .challenge-card.p2 .challenge-label { color: var(--def); }
+
+  .challenge-name {
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text);
+  }
+
+  .challenge-desc {
+    font-size: 0.85rem;
+    color: #a0a0b8;
+    font-weight: 400;
+    line-height: 1.4;
+  }
+
+  .empty-state {
+    text-align: center;
+    color: var(--muted);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    padding: 0.5rem 0;
+  }
+
+  /* Buttons */
+  .btn-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+
+  .btn {
+    padding: 1rem 1.25rem;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+
+  .btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.08);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .btn:hover::after { opacity: 1; }
+  .btn:active { transform: scale(0.97); }
+
+  .btn-full {
+    background: linear-gradient(135deg, #c46a10, var(--atk));
+    color: #fff;
+    box-shadow: 0 4px 20px var(--atk-glow);
+  }
+
+  .btn-full:hover { box-shadow: 0 4px 30px var(--atk-glow); }
+
+  .btn-challenge {
+    background: var(--surface2);
+    color: var(--text);
+    border: 1px solid var(--line);
+    box-shadow: none;
+  }
+
+  .btn-challenge:hover { border-color: var(--muted); }
+
+  /* Animations */
+  @keyframes fadeSlide {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .anim { animation: fadeSlide 0.3s ease forwards; }
+
+  /* Footer */
+  footer {
+    position: relative;
+    z-index: 1;
+    padding: 1.5rem;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    text-align: center;
+  }
+</style>
 </head>
 <body>
 
-    <h1>R6S Squad Challenges</h1>
+<header>
+  <div class="title-badge">// Rainbow Six Siege //</div>
+  <h1>Squad Challenges</h1>
+  <div class="divider"></div>
+</header>
 
-    <div class="generator-container">
-        <div class="ops-display">
-            <div class="op-card atk-type">
-                <div class="op-photo-box" id="atk-photo">?</div>
-                <div class="op-name" id="atk-name">Attacker</div>
-            </div>
-            <div class="op-card def-type">
-                <div class="op-photo-box" id="def-photo">?</div>
-                <div class="op-name" id="def-name">Defender</div>
-            </div>
-        </div>
-        <div id="challenge-display">Click "Generate Full Loadout" to start the mission.</div>
-        <div class="btn-group">
-            <button onclick="generateAll()">Generate Full Loadout</button>
-            <button class="secondary" onclick="rerollChallenge()">New Challenge Only</button>
-        </div>
-    </div>
+<main>
 
-    <script>
-        // Rosters including both Deimos and Denari
-        const attackers = ["Sledge", "Thatcher", "Ash", "Thermite", "Twitch", "Montagne", "Glaz", "Fuze", "Blitz", "IQ", "Buck", "Blackbeard", "Capitao", "Hibana", "Jackal", "Ying", "Zofia", "Dokkaebi", "Lion", "Finka", "Maverick", "Nomad", "Gridlock", "Nokk", "Amaru", "Kali", "Iana", "Ace", "Zero", "Flores", "Osa", "Sens", "Grim", "Brava", "Ram", "Deimos", "Denari", "Striker"];
-        const defenders = ["Smoke", "Mute", "Castle", "Pulse", "Doc", "Rook", "Kapkan", "Tachanka", "Jager", "Bandit", "Frost", "Valkyrie", "Caveira", "Echo", "Mira", "Lesion", "Ela", "Vigil", "Maestro", "Alibi", "Clash", "Kaid", "Mozzie", "Warden", "Goyo", "Wamai", "Oryx", "Melusi", "Aruni", "Thunderbird", "Thorn", "Azami", "Solis", "Fenrir", "Tubarao", "Sentry", "Skopos"];
+  <div class="operators-grid">
+    <div class="op-card attacker" id="atk-card">
+      <div class="op-role">Attacker</div>
+      <div class="op-icon" id="atk-icon">?</div>
+      <div class="op-name" id="atk-name">
+        <span class="empty-state">— READY —</span>
+      </div>
+    </div>
+    <div class="op-card defender" id="def-card">
+      <div class="op-role">Defender</div>
+      <div class="op-icon" id="def-icon">?</div>
+      <div class="op-name" id="def-name">
+        <span class="empty-state">— READY —</span>
+      </div>
+    </div>
+  </div>
 
-        const challenges = [
-            "**Iron Sights Only:** No optics allowed.",
-            "**Pistol Only:** Secondaries only for the full round.",
-            "**No Sprinting:** You must walk everywhere.",
-            "**Shield Rush:** Squad must pick shields.",
-            "**The Backpack:** Stay directly behind Monty's shield.",
-            "**Floor is Lava:** Stay on furniture/hatches in OBJ.",
-            "**Utility Only:** No guns until final 0:45."
-        ];
+  <div class="challenges-grid">
+    <div class="challenge-card p1">
+      <div class="challenge-label">// Player 1</div>
+      <div id="challenge-p1" class="empty-state">— STANDBY —</div>
+    </div>
+    <div class="challenge-card p2">
+      <div class="challenge-label">// Player 2</div>
+      <div id="challenge-p2" class="empty-state">— STANDBY —</div>
+    </div>
+  </div>
 
-        function generateAll() {
-            const atk = attackers[Math.floor(Math.random() * attackers.length)];
-            const def = defenders[Math.floor(Math.random() * defenders.length)];
-            
-            document.getElementById('atk-name').innerText = atk;
-            document.getElementById('def-name').innerText = def;
+  <div class="btn-group">
+    <button class="btn btn-full" onclick="rollFull()">⚡ Operators + Challenge</button>
+    <button class="btn btn-challenge" onclick="rollChallenge()">↻ New Challenge Only</button>
+  </div>
 
-            displayImage('atk-photo', atk);
-            displayImage('def-photo', def);
-            rerollChallenge();
-        }
+</main>
 
-        function displayImage(elementId, name) {
-            let n = name.toLowerCase();
-            
-            // Map names to specific weirdly-named files in your folder
-            if (n === "ash") n = "ash_317253";
-            if (n === "kali") n = "kali_358317";
-            if (n === "mozzie") n = "mozzie_343537";
-            if (n === "wamai") n = "wamai_358318";
-            if (n === "denari") n = "denari_2"; // Deimos is named deimos.avif, so n stays n.
+<footer>R6S SQUAD CHALLENGE GENERATOR &nbsp;·&nbsp; YEAR 11</footer>
+<script>
+  const attackers = ["Sledge","Thatcher","Ash","Thermite","Twitch","Montagne","Glaz","Fuze","Blitz","IQ","Buck","Blackbeard","Capitao","Hibana","Jackal","Ying","Zofia","Dokkaebi","Lion","Finka","Maverick","Nomad","Gridlock","Nokk","Amaru","Kali","Iana","Ace","Zero","Flores","Osa","Sens","Grim","Brava","Ram","Deimos","Denari","Striker"];
+  const defenders = ["Smoke","Mute","Castle","Pulse","Doc","Rook","Kapkan","Tachanka","Jager","Bandit","Frost","Valkyrie","Caveira","Echo","Mira","Lesion","Ela","Vigil","Maestro","Alibi","Clash","Kaid","Mozzie","Warden","Goyo","Wamai","Oryx","Melusi","Aruni","Thunderbird","Thorn","Azami","Solis","Fenrir","Tubarao","Sentry","Skopos"];
 
-            const folder = "siegeimages";
-            const ext = ".avif";
-            
-            const prefixes = [
-                "r6s-operators-list-",
-                "r6-operators-list-", 
-                "r6s-operator-list-",
-                "r6-operator-list-"
-            ];
-            
-            const container = document.getElementById(elementId);
-            let attempt = 0;
+  const challenges = [
+    { name: "Pistols Only", desc: "No primary. Sidearm all round. Yes, the whole round." },
+    { name: "Iron Sights Only", desc: "No optics. Remove every scope and play completely ironsights." },
+    { name: "No Sprinting", desc: "Walk only. You are not in a rush. You are calm. You are slow. You are dead." },
+    { name: "Floor is Lava", desc: "Stay off the ground floor at all times. Upstairs, balconies, rooftops only." },
+    { name: "Crouch Walk", desc: "No standing. Crouch the entire round like your knees are permanently bent." },
+    { name: "Hipfire Only", desc: "No ADS whatsoever. All kills must be hipfired. Point and pray." },
+    { name: "One Bullet Wonder", desc: "Fire only one shot at a time then lower your weapon before shooting again." },
+    { name: "No Reload", desc: "Once your mag runs dry, switch to pistol. No topping up mid-round." },
+    { name: "Knife Finish", desc: "You can use guns to down them but the kill must be melee. Get close." },
+    { name: "Backwards Only", desc: "Move backwards the entire round. Strafe is fine. Forward is cheating." },
+    { name: "No Gadget", desc: "Do not deploy your operator gadget. You're just a person with a gun today." },
+    { name: "Drone Blindfolded", desc: "No droning allowed at all. Go in completely blind. Good luck." },
+    { name: "Wall Hugger", desc: "Stay as close to walls as possible at all times. Never cross open space." },
+    { name: "Window Gang", desc: "Every entry must be through a window. No doors allowed whatsoever." },
+    { name: "Commando Roll Entry", desc: "Must vault or slide through something before every engagement." },
+    { name: "No Peeking", desc: "No leaning. Ever. If you can't see it straight on, you don't see it." },
+    { name: "Reload After Every Kill", desc: "Mandatory full reload after every single elimination. No exceptions." },
+    { name: "Bodyshots Only", desc: "No headshots. Aim for the chest. Headshots count as a death penalty — restart next life." },
+    { name: "One Life Serious Mode", desc: "Pretend you have one life in the match. If you die, sit out the rest of the round silently." },
+    { name: "Loudest Entry Possible", desc: "Make as much noise as possible getting in. Breach every wall, smash every window." },
+    { name: "Grenade First", desc: "Must throw a frag or gadget before you're allowed to fire your gun." },
+    { name: "Ceiling Watcher", desc: "Look up constantly. Spam ceilings before every room entry. Paranoia mode." },
+    { name: "No Running Start", desc: "Must stop completely still for 3 seconds before pushing any room." },
+    { name: "Pistol Primary, Primary Backup", desc: "Use your pistol as your main gun. Only pull the primary out if you're about to die." },
+    { name: "Last Bullet Wins", desc: "You must be on your last bullet before you're allowed to get the kill shot." },
+    { name: "Never Stop Moving", desc: "You cannot stand still for more than 2 seconds at any point in the round." },
+    { name: "Talk It Out", desc: "Narrate everything you're doing out loud in real time. Running commentary only." },
+    { name: "Paranoid Entry", desc: "Check every corner, every angle, every pixel before moving into any new space." },
+    { name: "No Vertical", desc: "You cannot shoot up or down. All kills must be on the same floor level as you." },
+    { name: "Maximum Aggression", desc: "Push immediately. No waiting, no setting up. First 10 seconds — go." },
+  ];
 
-            function tryLoad() {
-                if (attempt >= prefixes.length) {
-                    container.innerHTML = `<span style="color:#555">Error: ${name}</span>`;
-                    return;
-                }
-                
-                const img = new Image();
-                const currentUrl = `${folder}/${prefixes[attempt]}${n}${ext}`;
-                
-                img.onload = function() {
-                    container.innerHTML = `<img src="${currentUrl}" alt="${name}">`;
-                };
-                
-                img.onerror = function() {
-                    attempt++;
-                    tryLoad();
-                };
-                
-                img.src = currentUrl;
-            }
+  function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
-            tryLoad();
-        }
+  function getInitials(name) {
+    return name.length <= 3 ? name.slice(0,2).toUpperCase() : name.slice(0,2).toUpperCase();
+  }
 
-        function rerollChallenge() {
-            const chal = challenges[Math.floor(Math.random() * challenges.length)];
-            document.getElementById('challenge-display').innerHTML = chal.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-        }
-    </script>
+  function popCard(card) {
+    card.classList.remove('pop');
+    void card.offsetWidth;
+    card.classList.add('pop');
+    setTimeout(() => card.classList.remove('pop'), 300);
+  }
+
+  function rollOperators() {
+    const atk = pick(attackers);
+    const def = pick(defenders);
+
+    const atkCard = document.getElementById('atk-card');
+    const defCard = document.getElementById('def-card');
+
+    popCard(atkCard);
+    popCard(defCard);
+
+    const atkIcon = document.getElementById('atk-icon');
+    const defIcon = document.getElementById('def-icon');
+    const atkName = document.getElementById('atk-name');
+    const defName = document.getElementById('def-name');
+
+    atkIcon.textContent = getInitials(atk);
+    defIcon.textContent = getInitials(def);
+
+    atkName.innerHTML = `<span class="anim">${atk}</span>`;
+    defName.innerHTML = `<span class="anim">${def}</span>`;
+  }
+
+  function rollChallenge() {
+    const shuffled = [...challenges].sort(() => Math.random() - 0.5);
+    const c1 = shuffled[0];
+    const c2 = shuffled[1];
+
+    const p1 = document.getElementById('challenge-p1');
+    const p2 = document.getElementById('challenge-p2');
+
+    p1.className = 'anim';
+    p1.innerHTML = `<div class="challenge-name">${c1.name}</div><div class="challenge-desc">${c1.desc}</div>`;
+
+    p2.className = 'anim';
+    p2.innerHTML = `<div class="challenge-name">${c2.name}</div><div class="challenge-desc">${c2.desc}</div>`;
+  }
+
+  function rollFull() {
+    rollOperators();
+    rollChallenge();
+  }
+</script>
 </body>
 </html>
