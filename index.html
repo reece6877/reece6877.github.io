@@ -5,195 +5,85 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>R6S Challenge Generator</title>
     <style>
-        :root {
-            --r6-orange: #ffaa00;
-            --r6-dark: #1a1a1a;
-            --r6-gray: #2d2d2d;
-            --white: #ffffff;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--r6-dark);
-            color: var(--white);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-            margin: 0;
-        }
-
-        h1 {
-            border-bottom: 4px solid var(--r6-orange);
-            padding-bottom: 10px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        .generator-container {
-            background-color: var(--r6-gray);
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            text-align: center;
-            max-width: 800px;
-            width: 100%;
-        }
-
-        .ops-display {
-            display: flex;
-            justify-content: space-around;
-            margin-bottom: 30px;
-            gap: 20px;
-        }
-
-        .op-card {
-            flex: 1;
-            background: #111;
-            padding: 15px;
-            border: 1px solid #444;
-            border-top: 5px solid var(--r6-orange);
-        }
-
-        .op-photo-box {
-            width: 100%;
-            height: 200px;
-            background-color: #333;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 10px;
-            border: 1px dashed #555;
-            overflow: hidden;
-        }
-
-        .op-photo-box img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-        }
-
-        .op-name {
-            font-weight: bold;
-            font-size: 1.2rem;
-            text-transform: uppercase;
-        }
-
-        .op-type {
-            font-size: 0.8rem;
-            color: #888;
-        }
-
-        #challenge-display {
-            min-height: 100px;
-            margin: 20px 0;
-            padding: 20px;
-            background: rgba(255, 170, 0, 0.1);
-            border-left: 5px solid var(--r6-orange);
-            font-size: 1.1rem;
-            line-height: 1.5;
-        }
-
-        button {
-            background-color: var(--r6-orange);
-            color: black;
-            border: none;
-            padding: 15px 40px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            cursor: pointer;
-            text-transform: uppercase;
-            transition: transform 0.1s, background-color 0.2s;
-        }
-
-        button:hover {
-            background-color: #ffc247;
-        }
-
-        button:active {
-            transform: scale(0.95);
-        }
+        :root { --r6-orange: #ffaa00; --r6-dark: #1a1a1a; --r6-gray: #2d2d2d; --white: #ffffff; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: var(--r6-dark); color: var(--white); display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        .generator-container { background-color: var(--r6-gray); padding: 30px; border-radius: 12px; text-align: center; max-width: 800px; width: 100%; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #444; }
+        .ops-display { display: flex; justify-content: space-around; margin-bottom: 30px; gap: 20px; }
+        .op-card { flex: 1; background: #111; padding: 15px; border-top: 5px solid var(--r6-orange); border-radius: 4px; }
+        .op-photo-box { width: 100%; height: 250px; background-color: #222; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px solid #333; }
+        .op-photo-box img { width: 100%; height: 100%; object-fit: contain; }
+        .op-name { font-weight: bold; font-size: 1.2rem; letter-spacing: 1px; text-transform: uppercase; color: var(--r6-orange); }
+        #challenge-display { min-height: 80px; margin: 20px 0; padding: 20px; background: rgba(255, 170, 0, 0.1); border-left: 5px solid var(--r6-orange); font-size: 1.1rem; line-height: 1.4; font-weight: 500; }
+        button { background-color: var(--r6-orange); padding: 18px 50px; font-size: 1.3rem; font-weight: bold; cursor: pointer; border: none; transition: 0.2s; color: #000; }
+        button:hover { background-color: #ffc247; transform: translateY(-2px); }
+        button:active { transform: translateY(0); }
     </style>
 </head>
 <body>
 
-    <h1>R6S Squad Challenge</h1>
+    <h1 style="letter-spacing: 3px; margin-bottom: 30px;">R6S SQUAD CHALLENGES</h1>
 
     <div class="generator-container">
         <div class="ops-display">
             <div class="op-card">
-                <div class="op-photo-box" id="atk-photo">
-                    <span>Photo Placeholder</span>
-                </div>
-                <div class="op-name" id="atk-name">Attacker</div>
-                <div class="op-type">ATTACKER</div>
+                <div class="op-photo-box" id="atk-photo">?</div>
+                <div class="op-name" id="atk-name">ATTACKER</div>
             </div>
-
             <div class="op-card">
-                <div class="op-photo-box" id="def-photo">
-                    <span>Photo Placeholder</span>
-                </div>
-                <div class="op-name" id="def-name">Defender</div>
-                <div class="op-type">DEFENDER</div>
+                <div class="op-photo-box" id="def-photo">?</div>
+                <div class="op-name" id="def-name">DEFENDER</div>
             </div>
         </div>
 
-        <div id="challenge-display">
-            Click the button to generate a random challenge and operators!
-        </div>
-
-        <button onclick="generateChallenge()">Roll Random</button>
+        <div id="challenge-display">Click the button to roll your mission!</div>
+        <button onclick="generate()">GENERATE LOADOUT</button>
     </div>
 
     <script>
-        const attackers = [
-            "Sledge", "Thatcher", "Ash", "Thermite", "Twitch", "Montagne", "Glaz", "Fuze", "Blitz", "IQ", 
-            "Buck", "Blackbeard", "Capitão", "Hibana", "Jackal", "Ying", "Zofia", "Dokkaebi", "Lion", 
-            "Finka", "Maverick", "Nomad", "Gridlock", "Nøkk", "Amaru", "Kali", "Iana", "Ace", "Zero", 
-            "Flores", "Osa", "Sens", "Grim", "Brava", "Ram", "Deimos", "Striker", "Rauora", "Solid Snake"
-        ];
-
-        const defenders = [
-            "Smoke", "Mute", "Castle", "Pulse", "Doc", "Rook", "Kapkan", "Tachanka", "Jäger", "Bandit", 
-            "Frost", "Valkyrie", "Caveira", "Echo", "Mira", "Lesion", "Ela", "Vigil", "Maestro", "Alibi", 
-            "Clash", "Kaid", "Mozzie", "Warden", "Goyo", "Wamai", "Oryx", "Melusi", "Aruni", "Thunderbird", 
-            "Thorn", "Azami", "Solis", "Fenrir", "Tubarão", "Sentry", "Skopós"
-        ];
-
+        // Operators (No accents, and 'Solidsnake' fixed)
+        const attackers = ["Sledge", "Thatcher", "Ash", "Thermite", "Twitch", "Montagne", "Glaz", "Fuze", "Blitz", "IQ", "Buck", "Blackbeard", "Capitao", "Hibana", "Jackal", "Ying", "Zofia", "Dokkaebi", "Lion", "Finka", "Maverick", "Nomad", "Gridlock", "Nokk", "Amaru", "Kali", "Iana", "Ace", "Zero", "Flores", "Osa", "Sens", "Grim", "Brava", "Ram", "Deimos", "Striker", "Rauora", "Solidsnake"];
+        const defenders = ["Smoke", "Mute", "Castle", "Pulse", "Doc", "Rook", "Kapkan", "Tachanka", "Jager", "Bandit", "Frost", "Valkyrie", "Caveira", "Echo", "Mira", "Lesion", "Ela", "Vigil", "Maestro", "Alibi", "Clash", "Kaid", "Mozzie", "Warden", "Goyo", "Wamai", "Oryx", "Melusi", "Aruni", "Thunderbird", "Thorn", "Azami", "Solis", "Fenrir", "Tubarao", "Sentry", "Skopos"];
+        
         const challenges = [
-            "**Iron Sights Only:** Remove all optics from your weapons. You must win the match using only standard iron sights.",
-            "**Pistol/Secondary Only:** You are only allowed to use your secondary weapon for the entire match.",
-            "**The Pacifist Medic:** Play Doc and your only goal is to stim teammates and, if you're feeling crazy, try to stim an enemy without getting shot.",
-            "**Hide & Seek Mira:** As Mira, find a corner on the site (or even off-site) and just watch people walk by through your mirror without shooting them.",
-            "**The Kap-Man:** Place all of Kapkan's traps on a single door or window to create a massive firework show.",
-            "**Shield Rush:** Get your squad to all pick shield operators (Blitz, Montagne, Fuze with shield) and rush the objective.",
-            "**The Backpack:** One plays Montagne, the other a high-power op (Ash/Zofia). The shooter stays directly behind Monty. If Monty dies, the shooter prones until death.",
-            "**The Floor is Lava:** Both pick operators with shotguns. You are never allowed to touch the floor of the objective room. Stay on hatches, furniture, or hallways.",
-            "**The Distraction Duo:** One person makes extreme noise on one side; the other sneaks into objective from the opposite side using only a suppressed pistol.",
-            "**The Recruit Experience:** No unique gadgets. Use only primary weapon. If you use a gadget by accident, stare at a wall for 10 seconds as punishment.",
-            "**Luddite Mode:** No electronic gadgets. No drones, cams, scanners, or hacking. If it has a battery, it’s banned.",
-            "**The Heavyweight:** No sprinting and no vaulting. Walk everywhere. You must find a door or blow a hole to get through obstacles.",
-            "**The 'Stay Together' Tether:** You and your partner must stay within 5 meters. If the tether breaks, stop moving until you are touching again.",
-            "**The 'Silent But Deadly':** No primary weapons and no sprinting. Suppressed secondaries only. If spotted, you must retreat.",
-            "**Utility Only:** No guns allowed until the final 45 seconds of the round. Use only secondary gadgets (flashes/smokes) for the first 2 minutes."
+            "Iron Sights Only: Remove all optics from your weapons.",
+            "Pistol/Secondary Only: Use only your secondary weapon for the match.",
+            "The Pacifist Medic: Play Doc - only heal teammates. Try to stim an enemy!",
+            "Hide & Seek Mira: Watch enemies through the glass, but do not shoot them.",
+            "The Kap-Man: Place ALL Kapkan traps on a single door or window.",
+            "Shield Rush: Squad must pick shields (Blitz/Monty/Fuze) and rush OBJ.",
+            "The Backpack: Stay directly behind Monty. If he dies, you must prone.",
+            "The Floor is Lava: Shotguns only. Stay on furniture/hatches in OBJ.",
+            "The Distraction Duo: One makes noise, the other sneaks in with a silencer.",
+            "The Recruit: No gadgets. Accidental gadget use = 10s staring at a wall.",
+            "Luddite Mode: No electronics (drones, cams, Pulse, etc.) allowed.",
+            "The Heavyweight: No sprinting or vaulting. Walk everywhere.",
+            "The Tether: Stay within 5 meters of your partner at all times.",
+            "Silent But Deadly: No primary, no sprinting. Suppressed secondaries only.",
+            "Utility Only: No guns until the final 45 seconds of the round."
         ];
 
-        function generateChallenge() {
-            // Randomly select items
-            const randomAtk = attackers[Math.floor(Math.random() * attackers.length)];
-            const randomDef = defenders[Math.floor(Math.random() * defenders.length)];
-            const randomChal = challenges[Math.floor(Math.random() * challenges.length)];
+        function generate() {
+            const atkRaw = attackers[Math.floor(Math.random() * attackers.length)];
+            const defRaw = defenders[Math.floor(Math.random() * defenders.length)];
+            const chal = challenges[Math.floor(Math.random() * challenges.length)];
 
-            // Update Text
-            document.getElementById('atk-name').innerText = randomAtk;
-            document.getElementById('def-name').innerText = randomDef;
-            document.getElementById('challenge-display').innerHTML = randomChal;
+            // Update UI text
+            document.getElementById('atk-name').innerText = atkRaw;
+            document.getElementById('def-name').innerText = defRaw;
+            document.getElementById('challenge-display').innerText = chal;
 
-            // Update Photos (Placeholder Logic)
-            // To add real photos, name your images like "Ash.png" and use:
-            // document.getElementById('atk-photo').innerHTML = `<img src="images/${randomAtk}.png" alt="${randomAtk}">`;
-            document.getElementById('atk-photo').innerHTML = `<span>[${randomAtk} Photo]</span>`;
-            document.getElementById('def-photo').innerHTML = `<span>[${randomDef} Photo]</span>`;
+            // Folder path and file naming logic
+            const folder = "siegeimages";
+            const prefix = "r6-operators-list-";
+            const ext = ".avif";
+
+            // Build the image paths
+            const atkImg = `${folder}/${prefix}${atkRaw.toLowerCase()}${ext}`;
+            const defImg = `${folder}/${prefix}${defRaw.toLowerCase()}${ext}`;
+
+            // Update images (with a safety check if file is missing)
+            document.getElementById('atk-photo').innerHTML = `<img src="${atkImg}" alt="${atkRaw}" onerror="this.src='https://placehold.co/200x250?text=Missing+Image'">`;
+            document.getElementById('def-photo').innerHTML = `<img src="${defImg}" alt="${defRaw}" onerror="this.src='https://placehold.co/200x250?text=Missing+Image'">`;
         }
     </script>
 </body>
