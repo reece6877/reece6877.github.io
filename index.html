@@ -3,22 +3,159 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>R6S Challenge Generator</title>
+    <title>R6S Squad Challenges</title>
     <style>
-        :root { --r6-orange: #ffaa00; --r6-dark: #1a1a1a; --r6-gray: #2d2d2d; --white: #ffffff; }
-        body { font-family: 'Segoe UI', sans-serif; background-color: var(--r6-dark); color: var(--white); display: flex; flex-direction: column; align-items: center; padding: 20px; margin: 0; }
-        h1 { border-bottom: 4px solid var(--r6-orange); padding-bottom: 10px; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 30px; }
-        .generator-container { background-color: var(--r6-gray); padding: 30px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align: center; max-width: 850px; width: 100%; border: 1px solid #444; }
-        .ops-display { display: flex; justify-content: space-around; margin-bottom: 30px; gap: 20px; }
-        .op-card { flex: 1; background: #111; padding: 15px; border-top: 5px solid var(--r6-orange); border-radius: 4px; }
-        .op-photo-box { width: 100%; height: 280px; background-color: #222; display: flex; align-items: center; justify-content: center; margin-bottom: 15px; border: 1px solid #333; overflow: hidden; }
-        .op-photo-box img { width: 100%; height: 100%; object-fit: contain; }
-        .op-name { font-weight: bold; font-size: 1.3rem; text-transform: uppercase; color: var(--r6-orange); letter-spacing: 1px; }
-        #challenge-display { min-height: 80px; margin: 20px 0; padding: 20px; background: rgba(255, 170, 0, 0.05); border-left: 5px solid var(--r6-orange); font-size: 1.1rem; line-height: 1.5; text-align: left; }
-        .btn-group { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-        button { background-color: var(--r6-orange); color: black; border: none; padding: 15px 30px; font-size: 1.1rem; font-weight: bold; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
-        button:hover { background-color: #ffc247; transform: translateY(-2px); }
-        button.secondary { background-color: #444; color: white; }
+        :root { 
+            --r6-orange: #ffaa00; 
+            --r6-dark: #121212; 
+            --r6-gray: #1e1e1e; 
+            --white: #ffffff;
+            /* Official Team Colors */
+            --atk-blue: #0088ff;
+            --def-orange: #ff7700;
+        }
+
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            /* Added a subtle Siege pattern and made it super dark */
+            background-color: var(--r6-dark);
+            background-image: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)), 
+                              url('https://placehold.co/1920x1080?text=Siege+UI+Pattern');
+            color: var(--white); 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            padding: 20px; 
+            margin: 0; 
+            min-height: 100vh;
+        }
+
+        h1 { 
+            border-bottom: 4px solid var(--r6-orange); 
+            padding-bottom: 10px; 
+            text-transform: uppercase; 
+            letter-spacing: 4px; 
+            margin-bottom: 40px; 
+            text-shadow: 0 0 10px rgba(255,170,0,0.3);
+        }
+
+        .generator-container { 
+            background-color: var(--r6-gray); 
+            padding: 40px; 
+            border-radius: 12px; 
+            box-shadow: 0 15px 50px rgba(0,0,0,0.7); 
+            text-align: center; 
+            max-width: 900px; 
+            width: 100%; 
+            border: 1px solid #333; 
+        }
+
+        .ops-display { 
+            display: flex; 
+            justify-content: space-around; 
+            margin-bottom: 30px; 
+            gap: 30px; 
+        }
+
+        .op-card { 
+            flex: 1; 
+            /* The key new styling is here */
+            background: #000; /* Super dark card base */
+            padding: 20px; 
+            border-radius: 4px; 
+            border: 2px solid transparent; 
+            transition: all 0.3s;
+        }
+
+        /* Distinctive lighting for the roles */
+        .op-card.atk-type { 
+            border-color: var(--atk-blue); 
+            box-shadow: 0 0 20px rgba(0,136,255,0.15); 
+        }
+        .op-card.def-type { 
+            border-color: var(--def-orange); 
+            box-shadow: 0 0 20px rgba(255,119,0,0.15); 
+        }
+
+        .op-photo-box { 
+            width: 100%; 
+            height: 300px; 
+            background-color: #080808; /* Even darker photo background */
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            margin-bottom: 15px; 
+            border: 1px solid #222; 
+            overflow: hidden; 
+            border-radius: 2px;
+        }
+
+        .op-photo-box img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: contain; 
+        }
+
+        .op-name { 
+            font-weight: bold; 
+            font-size: 1.4rem; 
+            text-transform: uppercase; 
+            letter-spacing: 2px; 
+            margin-bottom: 5px;
+        }
+
+        /* Team names now match team colors */
+        .atk-type .op-name { color: var(--atk-blue); text-shadow: 0 0 5px rgba(0,136,255,0.4); }
+        .def-type .op-name { color: var(--def-orange); text-shadow: 0 0 5px rgba(255,119,0,0.4); }
+
+        #challenge-display { 
+            min-height: 80px; 
+            margin: 20px 0; 
+            padding: 25px; 
+            background: rgba(255, 170, 0, 0.05); 
+            border-left: 5px solid var(--r6-orange); 
+            font-size: 1.15rem; 
+            line-height: 1.6; 
+            text-align: left; 
+            color: #ccc;
+            border-radius: 4px;
+        }
+
+        .btn-group { 
+            display: flex; 
+            gap: 15px; 
+            justify-content: center; 
+            flex-wrap: wrap; 
+        }
+
+        button { 
+            background-color: var(--r6-orange); 
+            color: black; 
+            border: none; 
+            padding: 18px 35px; 
+            font-size: 1.1rem; 
+            font-weight: bold; 
+            cursor: pointer; 
+            text-transform: uppercase; 
+            letter-spacing: 1px;
+            transition: 0.2s; 
+            border-radius: 2px;
+        }
+
+        button:hover { 
+            background-color: #ffc247; 
+            transform: translateY(-2px); 
+            box-shadow: 0 5px 15px rgba(255,170,0,0.3);
+        }
+
+        button.secondary { 
+            background-color: #333; 
+            color: white; 
+            border: 1px solid #444;
+        }
+        button.secondary:hover { 
+            background-color: #444; 
+        }
     </style>
 </head>
 <body>
@@ -27,16 +164,16 @@
 
     <div class="generator-container">
         <div class="ops-display">
-            <div class="op-card">
+            <div class="op-card atk-type">
                 <div class="op-photo-box" id="atk-photo">?</div>
                 <div class="op-name" id="atk-name">Attacker</div>
             </div>
-            <div class="op-card">
+            <div class="op-card def-type">
                 <div class="op-photo-box" id="def-photo">?</div>
                 <div class="op-name" id="def-name">Defender</div>
             </div>
         </div>
-        <div id="challenge-display">Click "Generate Full Loadout" to start.</div>
+        <div id="challenge-display">Click "Generate Full Loadout" to start the mission.</div>
         <div class="btn-group">
             <button onclick="generateAll()">Generate Full Loadout</button>
             <button class="secondary" onclick="rerollChallenge()">New Challenge Only</button>
@@ -44,7 +181,8 @@
     </div>
 
     <script>
-        const attackers = ["Sledge", "Thatcher", "Ash", "Thermite", "Twitch", "Montagne", "Glaz", "Fuze", "Blitz", "IQ", "Buck", "Blackbeard", "Capitao", "Hibana", "Jackal", "Ying", "Zofia", "Dokkaebi", "Lion", "Finka", "Maverick", "Nomad", "Gridlock", "Nokk", "Amaru", "Kali", "Iana", "Ace", "Zero", "Flores", "Osa", "Sens", "Grim", "Brava", "Ram", "Deimos", "Striker", "Rauora", "Solidsnake"];
+        // Rosters including both Deimos and Denari
+        const attackers = ["Sledge", "Thatcher", "Ash", "Thermite", "Twitch", "Montagne", "Glaz", "Fuze", "Blitz", "IQ", "Buck", "Blackbeard", "Capitao", "Hibana", "Jackal", "Ying", "Zofia", "Dokkaebi", "Lion", "Finka", "Maverick", "Nomad", "Gridlock", "Nokk", "Amaru", "Kali", "Iana", "Ace", "Zero", "Flores", "Osa", "Sens", "Grim", "Brava", "Ram", "Deimos", "Denari", "Striker"];
         const defenders = ["Smoke", "Mute", "Castle", "Pulse", "Doc", "Rook", "Kapkan", "Tachanka", "Jager", "Bandit", "Frost", "Valkyrie", "Caveira", "Echo", "Mira", "Lesion", "Ela", "Vigil", "Maestro", "Alibi", "Clash", "Kaid", "Mozzie", "Warden", "Goyo", "Wamai", "Oryx", "Melusi", "Aruni", "Thunderbird", "Thorn", "Azami", "Solis", "Fenrir", "Tubarao", "Sentry", "Skopos"];
 
         const challenges = [
@@ -72,20 +210,19 @@
         function displayImage(elementId, name) {
             let n = name.toLowerCase();
             
-            // Fix the numbered outliers
+            // Map names to specific weirdly-named files in your folder
             if (n === "ash") n = "ash_317253";
             if (n === "kali") n = "kali_358317";
             if (n === "mozzie") n = "mozzie_343537";
             if (n === "wamai") n = "wamai_358318";
-            if (n === "deimos") n = "denari_2";
+            if (n === "denari") n = "denari_2"; // Deimos is named deimos.avif, so n stays n.
 
             const folder = "siegeimages";
             const ext = ".avif";
             
-            // All 4 possible variations seen in your folder
             const prefixes = [
+                "r6s-operators-list-",
                 "r6-operators-list-", 
-                "r6s-operators-list-", 
                 "r6s-operator-list-",
                 "r6-operator-list-"
             ];
@@ -108,7 +245,7 @@
                 
                 img.onerror = function() {
                     attempt++;
-                    tryLoad(); // Try the next prefix
+                    tryLoad();
                 };
                 
                 img.src = currentUrl;
